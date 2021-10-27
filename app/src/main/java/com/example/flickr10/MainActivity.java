@@ -49,8 +49,6 @@ public class MainActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(this);
 
         getGalleriesData();
-        System.out.println("test");
-
     }
 
     private void getGalleriesData(){

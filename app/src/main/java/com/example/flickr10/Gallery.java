@@ -1,22 +1,23 @@
 package com.example.flickr10;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Gallery {
     public String Id;
     public String Title;
     public String Description;
-    public List<Photo> Photos;
+    public ArrayList<Photo> Photos;
 
     public Gallery(){
 
     }
 
-    public List<Photo> getPhotos() {
+    public ArrayList<Photo> getPhotos() {
         return Photos;
     }
 
-    public void setPhotos(List<Photo> photos) {
+    public void setPhotos(ArrayList<Photo> photos) {
         Photos = photos;
     }
 

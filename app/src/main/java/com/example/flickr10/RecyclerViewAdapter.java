@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,8 +53,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             public void onItemClick(View v, int pos) {
                 Intent i = new Intent(context, PhotoListActivity.class);
 
-//                i.putExtra("GalleryTitle", galleries.get(pos).getTitle());
-//                i.putExtra("Photos", galleries.get(pos).getPhotos())
+                i.putExtra("GalleryTitle", galleries.get(pos).getTitle());
+
+                Bundle extra = new Bundle();
+                extra.putSerializable("Photos", galleries.get(pos).getPhotos());
+                i.putExtra("PhotosBundle", extra);
 
             }
         });

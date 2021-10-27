@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Flickr 1.0</string>
+
+    <string-array name="programming_languages">
+        <item>c#</item>
+        <item>Java</item>
+        <item>Kotlin</item>
+        <item>c++</item>
+        <item>Python</item>
+    </string-array>
+
+</resources>

@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
@@ -21,10 +22,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+public class RecyclerViewAdapter
+        extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>
+        implements View.OnClickListener {
 
     ArrayList<Gallery> galleries;
     Context context;
+
+    private View.OnClickListener listener;
 
     public RecyclerViewAdapter(Context ct, ArrayList<Gallery> gs){
         context = ct;
@@ -36,6 +41,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.album, parent, false);
+
+        view.setOnClickListener(this);
+
         return new ViewHolder(view);
     }
 
@@ -46,21 +54,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Picasso.get().load(galleries.get(position).getPhotos().get(0).getUrl()).fit().into(holder.img1);
         Picasso.get().load(galleries.get(position).getPhotos().get(1).getUrl()).fit().into(holder.img2);
         Picasso.get().load(galleries.get(position).getPhotos().get(2).getUrl()).fit().into(holder.img3);
-
-
-        holder.setItemClickListener(new ItemClickListener() {
-            @Override
-            public void onItemClick(View v, int pos) {
-                Intent i = new Intent(context, PhotoListActivity.class);
-
-                i.putExtra("GalleryTitle", galleries.get(pos).getTitle());
-
-                Bundle extra = new Bundle();
-                extra.putSerializable("Photos", galleries.get(pos).getPhotos());
-                i.putExtra("PhotosBundle", extra);
-
-            }
-        });
     }
 
     @Override
@@ -68,36 +61,32 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return galleries.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public void setOnClickListener(View.OnClickListener listener){
+        this.listener = listener;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (listener != null){
+            listener.onClick(view);
+        }
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView text1;
         ImageView img1, img2, img3;
+        CardView card;
 
-        private ItemClickListener itemClickListener;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            card = itemView.findViewById(R.id.album_card);
             text1 = itemView.findViewById(R.id.album_title);
             img1 = itemView.findViewById(R.id.myImageView);
             img2 = itemView.findViewById(R.id.myImageView2);
             img3 = itemView.findViewById(R.id.myImageView3);
-
-            itemView.setOnClickListener(this);
         }
-
-        @Override
-        public void onClick(View view) {
-            this.itemClickListener.onItemClick(view, getLayoutPosition());
-        }
-
-        public void setItemClickListener(ItemClickListener itemClickListener) {
-            this.itemClickListener = itemClickListener;
-        }
-    }
-
-    public interface ItemClickListener {
-
-        void onItemClick(View v,int pos);
     }
 }

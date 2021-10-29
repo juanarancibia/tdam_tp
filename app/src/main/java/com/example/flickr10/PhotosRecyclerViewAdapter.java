@@ -29,6 +29,7 @@ public class PhotosRecyclerViewAdapter extends RecyclerView.Adapter<PhotosRecycl
     public PhotosRecyclerViewAdapter.PhotoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.photos_list, parent, false);
+
         return new PhotosRecyclerViewAdapter.PhotoViewHolder(view);
     }
 
@@ -39,38 +40,20 @@ public class PhotosRecyclerViewAdapter extends RecyclerView.Adapter<PhotosRecycl
 
     @Override
     public int getItemCount() {
-        return 0;
+        return photos.size();
     }
 
     /**
      *
      */
-    public class PhotoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class PhotoViewHolder extends RecyclerView.ViewHolder {
 
         ImageView img1;
-
-        private RecyclerViewAdapter.ItemClickListener itemClickListener;
 
         public PhotoViewHolder(@NonNull View itemView) {
             super(itemView);
 
             img1 = itemView.findViewById(R.id.imageView);
-
-            itemView.setOnClickListener(this);
         }
-
-        @Override
-        public void onClick(View view) {
-            this.itemClickListener.onItemClick(view, getLayoutPosition());
-        }
-
-        public void setItemClickListener(RecyclerViewAdapter.ItemClickListener itemClickListener) {
-            this.itemClickListener = itemClickListener;
-        }
-    }
-
-    public interface ItemClickListener {
-
-        void onItemClick(View v,int pos);
     }
 }

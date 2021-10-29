@@ -1,17 +1,15 @@
 package com.example.flickr10;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.os.Bundle;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 
-public class PhotoListActivity extends AppCompatActivity {
+public class activity_list_photos extends AppCompatActivity {
 
     RecyclerView recyclerView;
     ArrayList<Photo> photos;
@@ -19,9 +17,11 @@ public class PhotoListActivity extends AppCompatActivity {
     TextView textView1;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photos_list);
+        setContentView(R.layout.activity_list_photos);
+
+        recyclerView = findViewById(R.id.photos_recycler_view);
 
         Bundle extra = getIntent().getBundleExtra("PhotosBundle");
         this.photos = (ArrayList<Photo>) extra.getSerializable("Photos");

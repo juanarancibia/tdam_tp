@@ -1,6 +1,8 @@
 package com.example.flickr10;
 
-public class Photo {
+import java.io.Serializable;
+
+public class Photo implements Serializable {
     public String Id;
     public String Secret;
     public String Server;

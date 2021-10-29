@@ -5,11 +5,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -31,7 +34,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int DEFAULT_TIMEOUT = 15000;
+    public static final int DEFAULT_TIMEOUT = 1000000;
 
     RecyclerView recyclerView;
     RequestQueue requestQueue;
@@ -136,6 +139,23 @@ public class MainActivity extends AppCompatActivity {
                 galleries.get(i).setPhotos(photosList.get(i));
             }
             RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, galleries);
+
+            adapter.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) {
+
+                    Intent i = new Intent(getApplicationContext(), activity_list_photos.class);
+
+                    i.putExtra("GalleryTitle", galleries.get(recyclerView.getChildAdapterPosition(view)).getTitle());
+
+                    Bundle extra = new Bundle();
+                    extra.putSerializable("Photos", galleries.get(recyclerView.getChildAdapterPosition(view)).getPhotos());
+                    i.putExtra("PhotosBundle", extra);
+
+                    view.getContext().startActivity(i);
+                }
+            });
+
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
         }

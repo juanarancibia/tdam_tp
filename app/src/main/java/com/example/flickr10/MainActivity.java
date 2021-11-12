@@ -34,7 +34,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int DEFAULT_TIMEOUT = 1000000;
+    public static final int DEFAULT_TIMEOUT = 9000000;
 
     RecyclerView recyclerView;
     RequestQueue requestQueue;
@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                             photo.setSecret(photoObject.getString("secret"));
                             photo.setServer(photoObject.getString("server"));
                             photo.setTitle(photoObject.getString("title"));
+                            photo.setOwner(photoObject.getString("owner"));
                             photo.setUrl(String.format(photoUrl,
                                     photo.getServer(),
                                     photo.getId(),

@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Flickr10">
         <activity
+            android:name=".WebViewActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activity_photo_detail"
+            android:exported="true" />
+        <activity
             android:name=".activity_list_photos"
             android:exported="true" />
         <activity

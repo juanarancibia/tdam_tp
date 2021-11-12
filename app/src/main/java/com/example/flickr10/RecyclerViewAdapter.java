@@ -72,6 +72,7 @@ public class RecyclerViewAdapter
         }
     }
 
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView text1;

@@ -14,12 +14,12 @@ import java.util.ArrayList;
 public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<CommentsRecyclerViewAdapter.CommentViewHolder>{
 
     Context context;
-    ArrayList<Comment> comments;
+    ArrayList<CommentModel> commentModels;
 
 
-    public CommentsRecyclerViewAdapter(Context context, ArrayList<Comment> comments) {
+    public CommentsRecyclerViewAdapter(Context context, ArrayList<CommentModel> commentModels) {
         this.context = context;
-        this.comments = comments;
+        this.commentModels = commentModels;
     }
 
     @NonNull
@@ -33,14 +33,14 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<CommentsRe
 
     @Override
     public void onBindViewHolder(@NonNull CommentsRecyclerViewAdapter.CommentViewHolder holder, int position) {
-        holder.content.setText(comments.get(position).getContent());
-        holder.author.setText(comments.get(position).getAuthorname());
-        holder.date.setText(comments.get(position).getDateCreate().toString());
+        holder.content.setText(commentModels.get(position).getContent());
+        holder.author.setText(commentModels.get(position).getAuthorname());
+        holder.date.setText(commentModels.get(position).getDateCreate().toString());
     }
 
     @Override
     public int getItemCount() {
-        return comments.size();
+        return commentModels.size();
     }
 
     public class CommentViewHolder extends RecyclerView.ViewHolder {

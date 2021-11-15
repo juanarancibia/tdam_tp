@@ -4,33 +4,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     RequestQueue requestQueue;
 
-    ArrayList<Gallery> galleries = new ArrayList<Gallery>();
-    ArrayList<ArrayList<Photo>> photosList = new ArrayList<ArrayList<Photo>>();
+    ArrayList<GalleryModel> galleries = new ArrayList<GalleryModel>();
+    ArrayList<ArrayList<PhotoModel>> photosList = new ArrayList<ArrayList<PhotoModel>>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,12 +53,12 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     JSONArray jsonArray = response.getJSONObject("galleries").getJSONArray("gallery");
                     for(int i = 0; i < jsonArray.length(); i++){
-                        Gallery gallery = new Gallery();
+                        GalleryModel galleryModel = new GalleryModel();
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        gallery.setTitle(jsonObject.getJSONObject("title").getString("_content"));
-                        gallery.setDescription(jsonObject.getJSONObject("description").getString("_content"));
-                        gallery.setId(jsonObject.getString("id"));
-                        galleries.add(gallery);
+                        galleryModel.setTitle(jsonObject.getJSONObject("title").getString("_content"));
+                        galleryModel.setDescription(jsonObject.getJSONObject("description").getString("_content"));
+                        galleryModel.setId(jsonObject.getString("id"));
+                        galleries.add(galleryModel);
                     }
                     getPhotosData(galleries);
                 } catch (Exception e) {
@@ -89,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
-    private void getPhotosData(ArrayList<Gallery> gals){
-        String url = "https://www.flickr.com/services/rest/?method=flickr.galleries.getPhotos&api_key=ff7e5e14cdd9399f18ea1e728ceffa43&gallery_id=%s&format=json&nojsoncallback=1";
+    private void getPhotosData(ArrayList<GalleryModel> gals){
+        String url = "https://www.flickr.com/services/rest/?method=flickr.galleries.getPhotos&api_key=ff7e5e14cdd9399f18ea1e728ceffa43&gallery_id=%s&extras=date_upload&format=json&nojsoncallback=1";
         String photoUrl = "https://live.staticflickr.com/%s/%s_%s.jpg";
 
         ArrayList<JsonObjectRequest> requests = new ArrayList<>();
@@ -101,23 +91,25 @@ public class MainActivity extends AppCompatActivity {
                 public void onResponse(JSONObject response) {
                     try {
                         JSONArray photosArray = response.getJSONObject("photos").getJSONArray("photo");
-                        ArrayList<Photo> photos = new ArrayList<>();
+                        ArrayList<PhotoModel> photoModels = new ArrayList<>();
                         for (int k = 0; k < photosArray.length(); k++) {
-                            Photo photo = new Photo();
+                            PhotoModel photoModel = new PhotoModel();
                             JSONObject photoObject = photosArray.getJSONObject(k);
-                            photo.setId(photoObject.getString("id"));
-                            photo.setSecret(photoObject.getString("secret"));
-                            photo.setServer(photoObject.getString("server"));
-                            photo.setTitle(photoObject.getString("title"));
-                            photo.setOwner(photoObject.getString("owner"));
-                            photo.setUrl(String.format(photoUrl,
-                                    photo.getServer(),
-                                    photo.getId(),
-                                    photo.getSecret()
+                            photoModel.setId(photoObject.getString("id"));
+                            photoModel.setSecret(photoObject.getString("secret"));
+                            photoModel.setServer(photoObject.getString("server"));
+                            photoModel.setTitle(photoObject.getString("title"));
+                            photoModel.setOwner(photoObject.getString("owner"));
+                            photoModel.setUrl(String.format(photoUrl,
+                                    photoModel.getServer(),
+                                    photoModel.getId(),
+                                    photoModel.getSecret()
                             ));
-                            photos.add(photo);
+                            photoModel.setDateUpload(new Date(photoObject.getLong("dateupload")));
+
+                            photoModels.add(photoModel);
                         }
-                        photosList.add(photos);
+                        photosList.add(photoModels);
                         initializeRecyclerView();
                     } catch (Exception e) {
                         e.printStackTrace();

@@ -13,12 +13,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 public class activity_list_photos extends AppCompatActivity {
 
     RecyclerView recyclerView;
-    ArrayList<Photo> photos;
+    ArrayList<PhotoModel> photoModels;
     String galleryTitle;
     TextView textView1;
     FloatingActionButton fab;
@@ -36,7 +35,7 @@ public class activity_list_photos extends AppCompatActivity {
         recyclerView = findViewById(R.id.photos_recycler_view);
 
         Bundle extra = getIntent().getBundleExtra("PhotosBundle");
-        this.photos = (ArrayList<Photo>) extra.getSerializable("Photos");
+        this.photoModels = (ArrayList<PhotoModel>) extra.getSerializable("Photos");
 
         this.galleryTitle = getIntent().getExtras().getString("GalleryTitle");
         textView1 = findViewById(R.id.gallery_title);
@@ -65,14 +64,14 @@ public class activity_list_photos extends AppCompatActivity {
             }
         });
 
-        PhotosRecyclerViewAdapter adapter = new PhotosRecyclerViewAdapter(this, photos);
+        PhotosRecyclerViewAdapter adapter = new PhotosRecyclerViewAdapter(this, photoModels);
 
         adapter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), activity_photo_detail.class);
 
-                i.putExtra("Photo", photos.get(recyclerView.getChildAdapterPosition(view)));
+                i.putExtra("Photo", photoModels.get(recyclerView.getChildAdapterPosition(view)));
 
                 view.getContext().startActivity(i);
             }
@@ -84,7 +83,8 @@ public class activity_list_photos extends AppCompatActivity {
         fab_order_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Collections.sort(photos, (o1, o2) -> (o1.getTitle().compareTo(o2.getTitle())));
+                Collections.sort(photoModels, (o2, o1) -> (o1.getTitle().compareTo(o2.getTitle())));
+                Collections.reverse(photoModels);
                 adapter.notifyDataSetChanged();
             }
         });
@@ -92,7 +92,8 @@ public class activity_list_photos extends AppCompatActivity {
         fab_order_date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Collections.sort(photos, (o1, o2) -> (o1.get().compareTo(o2.getTitle())));
+                Collections.sort(photoModels, (o2, o1) -> (o1.getDateUpload().compareTo(o2.getDateUpload())));
+                Collections.reverse(photoModels);
                 adapter.notifyDataSetChanged();
             }
         });

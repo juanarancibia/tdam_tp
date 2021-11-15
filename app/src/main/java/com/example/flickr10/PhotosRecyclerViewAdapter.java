@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,13 +16,13 @@ import java.util.ArrayList;
 public class PhotosRecyclerViewAdapter extends RecyclerView.Adapter<PhotosRecyclerViewAdapter.PhotoViewHolder> implements View.OnClickListener{
 
     Context context;
-    ArrayList<Photo> photos;
+    ArrayList<PhotoModel> photoModels;
 
     private View.OnClickListener listener;
 
-    public PhotosRecyclerViewAdapter(Context ctx, ArrayList<Photo> ps){
+    public PhotosRecyclerViewAdapter(Context ctx, ArrayList<PhotoModel> ps){
         this.context = ctx;
-        this.photos = ps;
+        this.photoModels = ps;
     }
 
     @NonNull
@@ -39,12 +38,12 @@ public class PhotosRecyclerViewAdapter extends RecyclerView.Adapter<PhotosRecycl
 
     @Override
     public void onBindViewHolder(@NonNull PhotosRecyclerViewAdapter.PhotoViewHolder holder, int position) {
-        Picasso.get().load(photos.get(position).getUrl()).fit().into(holder.img1);
+        Picasso.get().load(photoModels.get(position).getUrl()).fit().into(holder.img1);
     }
 
     @Override
     public int getItemCount() {
-        return photos.size();
+        return photoModels.size();
     }
 
     public void setOnClickListener(View.OnClickListener listener){

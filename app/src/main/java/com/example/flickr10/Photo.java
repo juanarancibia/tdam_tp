@@ -1,75 +1,33 @@
 package com.example.flickr10;
 
-import java.io.Serializable;
-import java.util.ArrayList;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
-public class Photo implements Serializable {
-    public String Id;
-    public String Secret;
+import java.util.Date;
+
+@Entity(primaryKeys = {"photo_id", "gallery_id"})
+public class Photo {
+
+    @ColumnInfo(name = "photo_id")
+    public int photo_id;
+
+    @ColumnInfo(name = "gallery_id")
+    public int gallery_id;
+
+    @ColumnInfo(name = "server")
     public String Server;
+
+    @ColumnInfo(name = "title")
     public String Title;
+
+    @ColumnInfo(name = "url")
     public String Url;
+
+    @ColumnInfo(name = "owner")
     public String Owner;
-    public ArrayList<Comment> Comments;
 
-    public String getId() {
-        return Id;
-    }
-
-    public String getOwner() {
-        return Owner;
-    }
-
-    public void setOwner(String owner) {
-        Owner = owner;
-    }
-
-    public String getSecret() {
-        return Secret;
-    }
-
-    public void setSecret(String secret) {
-        Secret = secret;
-    }
-
-    public String getServer() {
-        return Server;
-    }
-
-    public void setServer(String server) {
-        Server = server;
-    }
-
-    public String getTitle() {
-        return Title;
-    }
-
-    public void setTitle(String title) {
-        Title = title;
-    }
-
-    public ArrayList<Comment> getComments() {
-        return Comments;
-    }
-
-    public void setComments(ArrayList<Comment> comments) {
-        Comments = comments;
-    }
-
-    public String getUrl() {
-        return Url;
-    }
-
-    public void setUrl(String url) {
-        Url = url;
-    }
-
-    public void setId(String id) {
-        Id = id;
-    }
-
-    public Photo(){
-
-    }
+    @ColumnInfo(name = "dateupload")
+    public Long DateUpload;
 
 }

@@ -26,8 +26,10 @@ import java.util.Date;
 
 public class activity_photo_detail extends AppCompatActivity {
 
+    public static final int DEFAULT_TIMEOUT = 9000000;
+
     RecyclerView recyclerView;
-    Photo photo;
+    PhotoModel photoModel;
     ImageView imgView;
     RequestQueue requestQueue;
     FloatingActionButton fab_backward;
@@ -38,10 +40,10 @@ public class activity_photo_detail extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_detail);
 
-        photo = (Photo) getIntent().getExtras().get("Photo");
+        photoModel = (PhotoModel) getIntent().getExtras().get("Photo");
 
         imgView = findViewById(R.id.photo_detail_image);
-        Picasso.get().load(photo.getUrl()).fit().into(imgView);
+        Picasso.get().load(photoModel.getUrl()).fit().into(imgView);
 
         fab_backward = (FloatingActionButton) findViewById(R.id.floatingActionButton_photo_detail);
         fab_backward.setOnClickListener(new View.OnClickListener(){
@@ -57,7 +59,7 @@ public class activity_photo_detail extends AppCompatActivity {
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), WebViewActivity.class);
 
-                String url = "https://www.flickr.com/photos/" + photo.getOwner() + "/" + photo.getId();
+                String url = "https://www.flickr.com/photos/" + photoModel.getOwner() + "/" + photoModel.getId();
                 i.putExtra("Url", url);
 
                 view.getContext().startActivity(i);
@@ -67,7 +69,7 @@ public class activity_photo_detail extends AppCompatActivity {
         recyclerView = findViewById(R.id.photo_detail_recycler_view);
 
         requestQueue = Volley.newRequestQueue(this);
-        getComments(photo.Id);
+        getComments(photoModel.Id);
     }
 
     private void getComments(String photoId){
@@ -78,18 +80,18 @@ public class activity_photo_detail extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    ArrayList<Comment> comments = new ArrayList<>();
+                    ArrayList<CommentModel> commentModels = new ArrayList<>();
                     JSONArray commentsArray = response.getJSONObject("comments").getJSONArray("comment");
                     for (int i = 0; i < commentsArray.length(); i++) {
                         JSONObject comment = commentsArray.getJSONObject(i);
 
-                        comments.add(new Comment(
+                        commentModels.add(new CommentModel(
                                 comment.getString("realname"),
                                 comment.getString("_content"),
                                 comment.getString("authorname"),
                                 new Date((long) comment.getLong("datecreate"))));
                     }
-                    photo.setComments(comments);
+                    photoModel.setComments(commentModels);
 
                     initializeRecyclerView();
                 } catch (Exception e) {
@@ -107,7 +109,7 @@ public class activity_photo_detail extends AppCompatActivity {
     }
 
     private void initializeRecyclerView() {
-        CommentsRecyclerViewAdapter adapter = new CommentsRecyclerViewAdapter(this, photo.getComments());
+        CommentsRecyclerViewAdapter adapter = new CommentsRecyclerViewAdapter(this, photoModel.getComments());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }

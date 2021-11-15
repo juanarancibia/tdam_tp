@@ -1,53 +1,17 @@
 package com.example.flickr10;
 
-import java.util.ArrayList;
-import java.util.List;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
+@Entity
 public class Gallery {
-    public String Id;
+    @PrimaryKey
+    public int gallery_id;
+
+    @ColumnInfo(name = "title")
     public String Title;
+
+    @ColumnInfo(name = "description")
     public String Description;
-    public ArrayList<Photo> Photos;
-
-    public Gallery(){
-
-    }
-
-    public ArrayList<Photo> getPhotos() {
-        return Photos;
-    }
-
-    public void setPhotos(ArrayList<Photo> photos) {
-        Photos = photos;
-    }
-
-    public Gallery(String id, String title, String desc){
-        this.Id = id;
-        this.Title = title;
-        this.Description = desc;
-    }
-
-    public String getTitle() {
-        return Title;
-    }
-
-    public String getDescription() {
-        return Description;
-    }
-
-    public void setDescription(String description) {
-        Description = description;
-    }
-
-    public void setTitle(String title) {
-        Title = title;
-    }
-
-    public String getId() {
-        return Id;
-    }
-
-    public void setId(String id) {
-        Id = id;
-    }
 }

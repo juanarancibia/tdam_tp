@@ -1,11 +1,6 @@
 package com.example.flickr10;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,20 +13,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class RecyclerViewAdapter
         extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>
         implements View.OnClickListener {
 
-    ArrayList<Gallery> galleries;
+    ArrayList<GalleryModel> galleries;
     Context context;
 
     private View.OnClickListener listener;
 
-    public RecyclerViewAdapter(Context ct, ArrayList<Gallery> gs){
+    public RecyclerViewAdapter(Context ct, ArrayList<GalleryModel> gs){
         context = ct;
         galleries = gs;
     }

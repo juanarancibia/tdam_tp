@@ -1,49 +1,29 @@
 package com.example.flickr10;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.util.Date;
 
+@Entity(primaryKeys = {"photo_id","comment_id"})
 public class Comment {
-    public String Realname;
+
+    @ColumnInfo(name = "photo_id")
+    public int photo_id;
+
+    @ColumnInfo(name = "comment_id")
+    public int comment_id;
+
+    @ColumnInfo(name = "realname")
+    public int RealName;
+
+    @ColumnInfo(name = "content")
     public String Content;
-    public String Authorname;
-    public Date DateCreate;
 
-    public Comment(String realname, String content, String authorname, Date dateCreate) {
-        Realname = realname;
-        Content = content;
-        Authorname = authorname;
-        DateCreate = dateCreate;
-    }
+    @ColumnInfo(name = "authorname")
+    public String AuthorName;
 
-    public String getRealname() {
-        return Realname;
-    }
-
-    public void setRealname(String realname) {
-        Realname = realname;
-    }
-
-    public String getContent() {
-        return Content;
-    }
-
-    public void setContent(String content) {
-        Content = content;
-    }
-
-    public String getAuthorname() {
-        return Authorname;
-    }
-
-    public void setAuthorname(String authorname) {
-        Authorname = authorname;
-    }
-
-    public Date getDateCreate() {
-        return DateCreate;
-    }
-
-    public void setDateCreate(Date dateCreate) {
-        DateCreate = dateCreate;
-    }
+    @ColumnInfo(name = "datecreate")
+    public Long DateCreate;
 }

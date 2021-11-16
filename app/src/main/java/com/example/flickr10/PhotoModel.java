@@ -12,6 +12,17 @@ public class PhotoModel implements Serializable {
     public String Url;
     public String Owner;
     public Date DateUpload;
+
+    public PhotoModel(String id, String secret, String server, String title, String url, String owner, Date dateUpload) {
+        Id = id;
+        Secret = secret;
+        Server = server;
+        Title = title;
+        Url = url;
+        Owner = owner;
+        DateUpload = dateUpload;
+    }
+
     public ArrayList<CommentModel> commentModels;
 
     public Date getDateUpload() {

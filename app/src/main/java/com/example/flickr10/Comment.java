@@ -1,5 +1,6 @@
 package com.example.flickr10;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -10,13 +11,15 @@ import java.util.Date;
 public class Comment {
 
     @ColumnInfo(name = "photo_id")
-    public int photo_id;
+    @NonNull
+    public String photo_id;
 
     @ColumnInfo(name = "comment_id")
-    public int comment_id;
+    @NonNull
+    public String comment_id;
 
     @ColumnInfo(name = "realname")
-    public int RealName;
+    public String RealName;
 
     @ColumnInfo(name = "content")
     public String Content;

@@ -3,16 +3,26 @@ package com.example.flickr10;
 import java.util.Date;
 
 public class CommentModel {
+    public String Id;
     public String Realname;
     public String Content;
     public String Authorname;
     public Date DateCreate;
 
-    public CommentModel(String realname, String content, String authorname, Date dateCreate) {
+    public CommentModel(String id, String realname, String content, String authorname, Date dateCreate) {
+        Id = id;
         Realname = realname;
         Content = content;
         Authorname = authorname;
         DateCreate = dateCreate;
+    }
+
+    public String getId() {
+        return Id;
+    }
+
+    public void setId(String id) {
+        Id = id;
     }
 
     public String getRealname() {

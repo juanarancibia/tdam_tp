@@ -1,10 +1,17 @@
 package com.example.flickr10;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -21,10 +28,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final int DEFAULT_TIMEOUT = 9000000;
+
+    AppDatabase db;
 
     RecyclerView recyclerView;
     RequestQueue requestQueue;
@@ -32,16 +42,77 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<GalleryModel> galleries = new ArrayList<GalleryModel>();
     ArrayList<ArrayList<PhotoModel>> photosList = new ArrayList<ArrayList<PhotoModel>>();
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        db = AppDatabase.getDatabase(getApplicationContext());
+
+
+
         recyclerView  = findViewById(R.id.reciclerView);
 
-        requestQueue = Volley.newRequestQueue(this);
+        if(isNetworkAvailable()){
+            requestQueue = Volley.newRequestQueue(this);
 
-        getGalleriesData();
+            getGalleriesData();
+        } else {
+            getGalleriesDB();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void getGalleriesDB() {
+        db.galleryDAO().getAll().observe(this, raw_gals -> {
+            if(raw_gals == null){
+                return;
+            }
+            ArrayList<GalleryModel> mapped_galleries = new ArrayList<GalleryModel>();
+            for(int i = 0; i<raw_gals.size();i++){
+                Gallery curr_gal = raw_gals.get(i);
+                mapped_galleries.add(new GalleryModel(
+                        curr_gal.gallery_id,
+                        curr_gal.Title,
+                        curr_gal.Description
+                ));
+            }
+            galleries = mapped_galleries;
+
+            getPhotosDBData();
+        });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void getPhotosDBData(){
+        for(int i = 0; i < galleries.size(); i++){
+            db.photoDao().getAll(galleries.get(i).getId()).observe(this, raw_photos -> {
+                if(raw_photos == null){
+                    return;
+                }
+                ArrayList<PhotoModel> mapped_photos = new ArrayList<>();
+                for(int j = 0; j<raw_photos.size(); j++){
+                    Photo curr_photo = raw_photos.get(j);
+                    mapped_photos.add(new PhotoModel(
+                            curr_photo.photo_id,
+                            curr_photo.Secret,
+                            curr_photo.Server,
+                            curr_photo.Title,
+                            curr_photo.Url,
+                            curr_photo.Owner,
+                            new Date(curr_photo.DateUpload)
+                    ));
+                }
+
+                galleries.stream().filter(g -> g.getId().equals(raw_photos.get(0).gallery_id))
+                .findFirst().get().setPhotos(mapped_photos);
+
+                if(raw_photos.get(0).gallery_id.equals(galleries.get(galleries.size()-1).getId())){
+                    initializeRecyclerView();
+                }
+            });
+        }
     }
 
     private void getGalleriesData(){
@@ -110,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                             photoModels.add(photoModel);
                         }
                         photosList.add(photoModels);
-                        initializeRecyclerView();
+                        prepareGalleryPhoto();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -126,32 +197,97 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initializeRecyclerView(){
+    private void prepareGalleryPhoto(){
         if(galleries.size() == photosList.size()) {
             for (int i = 0; i < galleries.size(); i++) {
                 galleries.get(i).setPhotos(photosList.get(i));
             }
-            RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, galleries);
 
-            adapter.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view) {
-
-                    Intent i = new Intent(getApplicationContext(), activity_list_photos.class);
-
-                    i.putExtra("GalleryTitle", galleries.get(recyclerView.getChildAdapterPosition(view)).getTitle());
-
-                    Bundle extra = new Bundle();
-                    extra.putSerializable("Photos", galleries.get(recyclerView.getChildAdapterPosition(view)).getPhotos());
-                    i.putExtra("PhotosBundle", extra);
-
-                    view.getContext().startActivity(i);
-                }
-            });
-
-            recyclerView.setAdapter(adapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            initializeRecyclerView();
         }
+    }
+
+    private void initializeRecyclerView(){
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, galleries);
+
+        adapter.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), activity_list_photos.class);
+
+                i.putExtra("GalleryTitle", galleries.get(recyclerView.getChildAdapterPosition(view)).getTitle());
+
+                Bundle extra = new Bundle();
+                extra.putSerializable("Photos", galleries.get(recyclerView.getChildAdapterPosition(view)).getPhotos());
+                i.putExtra("PhotosBundle", extra);
+
+                view.getContext().startActivity(i);
+            }
+        });
+
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        if(isNetworkAvailable()) {
+            saveGalleries();
+            savePhotos();
+        }
+    }
+
+    private void savePhotos() {
+        new Thread(){
+            @Override
+            public void run(){
+                try{
+                    List<Photo> photos = new ArrayList<Photo>();
+                    for(int i = 0; i<galleries.size();i++){
+                        for(int j = 0; j<photosList.get(i).size();j++){
+                            Photo photo_to_add = new Photo();
+                            photo_to_add.photo_id = galleries.get(i).getPhotos().get(j).getId();
+                            photo_to_add.gallery_id = galleries.get(i).getId();
+                            photo_to_add.Title = galleries.get(i).getPhotos().get(j).getTitle();
+                            photo_to_add.Server = galleries.get(i).getPhotos().get(j).getServer();
+                            photo_to_add.Owner = galleries.get(i).getPhotos().get(j).getOwner();
+                            photo_to_add.Url = galleries.get(i).getPhotos().get(j).getUrl();
+                            photo_to_add.DateUpload = galleries.get(i).getPhotos().get(j).getDateUpload().getTime();
+                            photos.add(photo_to_add);
+                        }
+                    }
+                    db.photoDao().insertAll(photos);
+                } catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    private void saveGalleries() {
+        new Thread(){
+            @Override
+            public void run(){
+                try{
+                    List<Gallery> gals = new ArrayList<Gallery>();
+                    for(int i = 0; i<galleries.size();i++){
+                        Gallery gallery_to_add = new Gallery();
+                        gallery_to_add.gallery_id = galleries.get(i).getId();
+                        gallery_to_add.Title = galleries.get(i).getTitle();
+                        gallery_to_add.Description = galleries.get(i).getDescription();
+                        gals.add(gallery_to_add);
+                    }
+
+                    long[] result = db.galleryDAO().insertAll(gals);
+                } catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }
 

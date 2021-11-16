@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class activity_photo_detail extends AppCompatActivity {
 
@@ -35,10 +36,14 @@ public class activity_photo_detail extends AppCompatActivity {
     FloatingActionButton fab_backward;
     FloatingActionButton fab_www;
 
+    AppDatabase db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_detail);
+
+        db = AppDatabase.getDatabase(getApplicationContext());
 
         photoModel = (PhotoModel) getIntent().getExtras().get("Photo");
 
@@ -86,6 +91,7 @@ public class activity_photo_detail extends AppCompatActivity {
                         JSONObject comment = commentsArray.getJSONObject(i);
 
                         commentModels.add(new CommentModel(
+                                comment.getString("id"),
                                 comment.getString("realname"),
                                 comment.getString("_content"),
                                 comment.getString("authorname"),
@@ -112,5 +118,36 @@ public class activity_photo_detail extends AppCompatActivity {
         CommentsRecyclerViewAdapter adapter = new CommentsRecyclerViewAdapter(this, photoModel.getComments());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        saveComments();
+    }
+
+    private void saveComments() {
+        new Thread(){
+            @Override
+            public void run(){
+                try{
+                    List<Comment> comms = new ArrayList<Comment>();
+                    ArrayList<CommentModel> comments = photoModel.getComments();
+                    for(int i = 0; i<comments.size();i++){
+                        Comment comment_to_add = new Comment();
+                        comment_to_add.photo_id = photoModel.getId();
+                        comment_to_add.comment_id = comments.get(i).getId();
+                        comment_to_add.RealName = comments.get(i).getRealname();
+                        comment_to_add.Content = comments.get(i).getContent();
+                        comment_to_add.AuthorName = comments.get(i).getAuthorname();
+                        comment_to_add.DateCreate = comments.get(i).getDateCreate().getTime();
+
+                        comms.add(comment_to_add);
+                    }
+
+                    db.commentDAO().insertAll(comms);
+                } catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+        }.start();
+
     }
 }

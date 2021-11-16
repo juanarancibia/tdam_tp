@@ -1,5 +1,6 @@
 package com.example.flickr10;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -7,7 +8,8 @@ import androidx.room.PrimaryKey;
 @Entity
 public class Gallery {
     @PrimaryKey
-    public int gallery_id;
+    @NonNull
+    public String gallery_id;
 
     @ColumnInfo(name = "title")
     public String Title;

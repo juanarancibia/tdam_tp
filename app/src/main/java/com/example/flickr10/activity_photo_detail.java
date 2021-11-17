@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -111,7 +112,11 @@ public class activity_photo_detail extends AppCompatActivity {
             }
         });
 
-        requestQueue.add(jsonObjectRequest);
+        requestQueue.add(jsonObjectRequest).setRetryPolicy(new DefaultRetryPolicy(
+                DEFAULT_TIMEOUT,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));;
     }
 
     private void initializeRecyclerView() {

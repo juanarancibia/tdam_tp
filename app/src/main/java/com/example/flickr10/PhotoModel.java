@@ -12,8 +12,9 @@ public class PhotoModel implements Serializable {
     public String Url;
     public String Owner;
     public Date DateUpload;
+    public String LocalPath;
 
-    public PhotoModel(String id, String secret, String server, String title, String url, String owner, Date dateUpload) {
+    public PhotoModel(String id, String secret, String server, String title, String url, String owner, Date dateUpload, String localPath) {
         Id = id;
         Secret = secret;
         Server = server;
@@ -21,6 +22,15 @@ public class PhotoModel implements Serializable {
         Url = url;
         Owner = owner;
         DateUpload = dateUpload;
+        LocalPath = localPath;
+    }
+
+    public String getLocalPath() {
+        return LocalPath;
+    }
+
+    public void setLocalPath(String localPath) {
+        LocalPath = localPath;
     }
 
     public ArrayList<CommentModel> commentModels;

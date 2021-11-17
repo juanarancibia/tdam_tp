@@ -2,11 +2,16 @@ package com.example.flickr10;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -59,6 +64,28 @@ public class MainActivity extends AppCompatActivity {
 
             getGalleriesData();
         } else {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                Intent intent = new Intent(this, MainActivity.class);
+                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+                String channelId = "channel_1";
+                NotificationChannel channel = new NotificationChannel(channelId, "Notifications",
+                        NotificationManager.IMPORTANCE_DEFAULT);
+                NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                notificationManager.createNotificationChannel(channel);
+
+
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+                        .setSmallIcon(R.drawable.flickr)
+                        .setContentTitle("Flickr APP")
+                        .setContentText("No es posible actualizar el listado de directorios desde la web. Se caragarán desde Base de Datos")
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentIntent(pendingIntent)
+                        .setAutoCancel(true);
+                NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+                notificationManagerCompat.notify(1, builder.build());
+            }
+
             getGalleriesDB();
         }
     }
@@ -101,7 +128,8 @@ public class MainActivity extends AppCompatActivity {
                             curr_photo.Title,
                             curr_photo.Url,
                             curr_photo.Owner,
-                            new Date(curr_photo.DateUpload)
+                            new Date(curr_photo.DateUpload),
+                            curr_photo.LocalPath
                     ));
                 }
 
@@ -208,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeRecyclerView(){
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, galleries);
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, galleries, isNetworkAvailable());
 
         adapter.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -250,7 +278,10 @@ public class MainActivity extends AppCompatActivity {
                             photo_to_add.Owner = galleries.get(i).getPhotos().get(j).getOwner();
                             photo_to_add.Url = galleries.get(i).getPhotos().get(j).getUrl();
                             photo_to_add.DateUpload = galleries.get(i).getPhotos().get(j).getDateUpload().getTime();
+                            photo_to_add.LocalPath = galleries.get(i).getId() + "_" +
+                                                    galleries.get(i).getPhotos().get(j).getId();
                             photos.add(photo_to_add);
+                            photo_to_add.saveImage();
                         }
                     }
                     db.photoDao().insertAll(photos);

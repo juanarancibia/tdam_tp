@@ -1,6 +1,11 @@
 package com.example.flickr10;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class RecyclerViewAdapter
@@ -21,12 +27,14 @@ public class RecyclerViewAdapter
 
     ArrayList<GalleryModel> galleries;
     Context context;
+    Boolean internetAvailable = true;
 
     private View.OnClickListener listener;
 
-    public RecyclerViewAdapter(Context ct, ArrayList<GalleryModel> gs){
+    public RecyclerViewAdapter(Context ct, ArrayList<GalleryModel> gs, Boolean intAvailable){
         context = ct;
         galleries = gs;
+        internetAvailable = intAvailable;
     }
 
     @NonNull
@@ -44,9 +52,15 @@ public class RecyclerViewAdapter
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.text1.setText(galleries.get(position).getTitle());
 
-        Picasso.get().load(galleries.get(position).getPhotos().get(0).getUrl()).fit().into(holder.img1);
-        Picasso.get().load(galleries.get(position).getPhotos().get(1).getUrl()).fit().into(holder.img2);
-        Picasso.get().load(galleries.get(position).getPhotos().get(2).getUrl()).fit().into(holder.img3);
+        if(internetAvailable){
+            Picasso.get().load(galleries.get(position).getPhotos().get(0).getUrl()).fit().into(holder.img1);
+            Picasso.get().load(galleries.get(position).getPhotos().get(1).getUrl()).fit().into(holder.img2);
+            Picasso.get().load(galleries.get(position).getPhotos().get(2).getUrl()).fit().into(holder.img3);
+        } else {
+            loadLocalImage(holder.img1, galleries.get(position).getPhotos().get(0).getLocalPath());
+            loadLocalImage(holder.img2, galleries.get(position).getPhotos().get(1).getLocalPath());
+            loadLocalImage(holder.img3, galleries.get(position).getPhotos().get(2).getLocalPath());
+        }
     }
 
     @Override
@@ -81,6 +95,16 @@ public class RecyclerViewAdapter
             img1 = itemView.findViewById(R.id.myImageView);
             img2 = itemView.findViewById(R.id.myImageView2);
             img3 = itemView.findViewById(R.id.myImageView3);
+        }
+    }
+
+    public void loadLocalImage(ImageView imgView, String imgPath){
+        String root = Environment.getExternalStorageDirectory().toString();
+        File imgFile = new File("/flickr_images/" + imgPath);
+
+        if(imgFile.exists()){
+            Bitmap imgBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            imgView.setImageBitmap(imgBitmap);
         }
     }
 }

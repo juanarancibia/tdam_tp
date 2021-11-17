@@ -12,7 +12,7 @@ import java.util.List;
 @Dao
 public interface CommentDAO {
     @Query("SELECT * FROM Comment WHERE photo_id = :p_id")
-    LiveData<List<Comment>> getAll(int p_id);
+    LiveData<List<Comment>> getAll(String p_id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<Comment> comments);

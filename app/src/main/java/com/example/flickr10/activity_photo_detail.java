@@ -4,7 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -74,8 +77,34 @@ public class activity_photo_detail extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.photo_detail_recycler_view);
 
-        requestQueue = Volley.newRequestQueue(this);
-        getComments(photoModel.Id);
+        if(isNetworkAvailable()){
+            requestQueue = Volley.newRequestQueue(this);
+            getComments(photoModel.Id);
+        } else {
+            getCommentsDB(photoModel.Id);
+        }
+
+    }
+
+    private void getCommentsDB(String id) {
+        db.commentDAO().getAll(id).observe(this, raw_comments -> {
+            if(raw_comments == null){
+                return;
+            }
+            ArrayList<CommentModel> mapped_comments = new ArrayList<CommentModel>();
+            for(int i = 0; i<raw_comments.size(); i++){
+                Comment curr_comm = raw_comments.get(i);
+                mapped_comments.add(new CommentModel(
+                        curr_comm.comment_id,
+                        curr_comm.RealName,
+                        curr_comm.Content,
+                        curr_comm.AuthorName,
+                        new Date(curr_comm.DateCreate)
+                ));
+            }
+            photoModel.setComments(mapped_comments);
+            initializeRecyclerView();
+        });
     }
 
     private void getComments(String photoId){
@@ -124,7 +153,9 @@ public class activity_photo_detail extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        saveComments();
+        if(isNetworkAvailable()){
+            saveComments();
+        }
     }
 
     private void saveComments() {
@@ -154,5 +185,12 @@ public class activity_photo_detail extends AppCompatActivity {
 
         }.start();
 
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

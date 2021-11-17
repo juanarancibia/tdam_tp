@@ -12,6 +12,7 @@ import androidx.room.Room;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -19,6 +20,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -47,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<GalleryModel> galleries = new ArrayList<GalleryModel>();
     ArrayList<ArrayList<PhotoModel>> photosList = new ArrayList<ArrayList<PhotoModel>>();
 
+    ProgressDialog spinner;
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         recyclerView  = findViewById(R.id.reciclerView);
+
+        spinner = ProgressDialog.show(this, "Flickr APP", "Loading data...", true);
 
         if(isNetworkAvailable()){
             requestQueue = Volley.newRequestQueue(this);
@@ -85,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
                 NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
                 notificationManagerCompat.notify(1, builder.build());
             }
-
             getGalleriesDB();
         }
     }
@@ -255,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        spinner.dismiss();
 
         if(isNetworkAvailable()) {
             saveGalleries();

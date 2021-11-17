@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -42,12 +43,16 @@ public class activity_photo_detail extends AppCompatActivity {
 
     AppDatabase db;
 
+    ProgressDialog spinner;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_detail);
 
         db = AppDatabase.getDatabase(getApplicationContext());
+
+        spinner = ProgressDialog.show(this, "Flickr APP", "Loading data...", true);
 
         photoModel = (PhotoModel) getIntent().getExtras().get("Photo");
 
@@ -152,6 +157,8 @@ public class activity_photo_detail extends AppCompatActivity {
         CommentsRecyclerViewAdapter adapter = new CommentsRecyclerViewAdapter(this, photoModel.getComments());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        spinner.dismiss();
 
         if(isNetworkAvailable()){
             saveComments();

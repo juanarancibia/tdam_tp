@@ -57,9 +57,13 @@ public class RecyclerViewAdapter
             Picasso.get().load(galleries.get(position).getPhotos().get(1).getUrl()).fit().into(holder.img2);
             Picasso.get().load(galleries.get(position).getPhotos().get(2).getUrl()).fit().into(holder.img3);
         } else {
-            loadLocalImage(holder.img1, galleries.get(position).getPhotos().get(0).getLocalPath());
-            loadLocalImage(holder.img2, galleries.get(position).getPhotos().get(1).getLocalPath());
-            loadLocalImage(holder.img3, galleries.get(position).getPhotos().get(2).getLocalPath());
+            Picasso.get().load(galleries.get(position).getPhotos().get(0).getUrl()).fit().into(holder.img1);
+            Picasso.get().load(galleries.get(position).getPhotos().get(1).getUrl()).fit().into(holder.img2);
+            Picasso.get().load(galleries.get(position).getPhotos().get(2).getUrl()).fit().into(holder.img3);
+
+//            loadLocalImage(holder.img1, galleries.get(position).getPhotos().get(0).getLocalPath());
+//            loadLocalImage(holder.img2, galleries.get(position).getPhotos().get(1).getLocalPath());
+//            loadLocalImage(holder.img3, galleries.get(position).getPhotos().get(2).getLocalPath());
         }
     }
 
